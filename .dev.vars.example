@@ -1,0 +1,8 @@
+# Optional local Worker variables. Copy to .dev.vars; never commit real credentials.
+# Changing this email does not provide authentication. Admin login requires Sites.
+ADMIN_EMAIL=yashpatel9724945@gmail.com
+CASHFREE_ENV=sandbox
+CASHFREE_CHECKOUT_ENABLED=false
+# Leave these unset unless doing an authorized Cashfree sandbox integration.
+# CASHFREE_APP_ID=
+# CASHFREE_SECRET_KEY=

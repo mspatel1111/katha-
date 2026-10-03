@@ -1,0 +1,2 @@
+import {getCatalogProducts} from "@/lib/catalog-db";import {SITE_ORIGIN} from "@/lib/seo";import {CATEGORIES,productHref} from "@/lib/catalog";
+export default async function sitemap(){const products=await getCatalogProducts();return [...["","/shop","/contact","/policies","/faq","/size-guide"].map(path=>({url:SITE_ORIGIN+path})),...CATEGORIES.map(category=>({url:SITE_ORIGIN+"/shop?category="+encodeURIComponent(category)})),...products.map(p=>({url:SITE_ORIGIN+productHref(p),lastModified:p.updatedAt?new Date(p.updatedAt+"Z"):undefined}))];}

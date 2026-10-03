@@ -1,0 +1,20 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import { DatabaseSync } from "node:sqlite";
+import { readdir, readFile } from "node:fs/promises";
+test("additive product migration preserves existing stock, orders and uploads", async () => {
+  const db = new DatabaseSync(":memory:");
+  const files = (await readdir("drizzle")).filter(name => name.endsWith(".sql")).sort();
+  for (const name of files.slice(0,4)) for (const sql of (await readFile("drizzle/"+name,"utf8")).split("--> statement-breakpoint").filter(s=>s.trim())) db.exec(sql);
+  db.exec("INSERT INTO product_overrides(id,name,price,image,stock_s) VALUES(30,'Existing',2000,'/api/images/products/existing-master.webp',9)");
+  db.exec("INSERT INTO orders(id,receipt,customer_name,email,phone,address,city,state,pincode,amount,payment_method) VALUES('KATOLD','old','Customer','a@b.com','9999999999','Address','City','Gujarat','383305',2000,'cod')");
+  for (const name of files.slice(4)) for (const sql of (await readFile("drizzle/"+name,"utf8")).split("--> statement-breakpoint").filter(s=>s.trim())) db.exec(sql);
+  assert.equal(db.prepare("SELECT stock_s FROM product_overrides WHERE id=30").get().stock_s,9);
+  assert.equal(db.prepare("SELECT image FROM product_overrides WHERE id=30").get().image,"/api/images/products/existing-master.webp");
+  assert.equal(db.prepare("SELECT amount FROM orders WHERE id='KATOLD'").get().amount,2000);
+  db.exec("UPDATE product_overrides SET sku='SKU30',slug='existing' WHERE id=30");
+  assert.throws(()=>db.exec("INSERT INTO product_overrides(id,name,price,image,sku,slug) VALUES(31,'Duplicate',100,'/images/test.webp','SKU30','new')"),/UNIQUE/);
+  db.exec("INSERT INTO product_images(product_id,url,is_primary) VALUES(30,'/images/test.webp',1)");
+  assert.throws(()=>db.exec("INSERT INTO product_images(product_id,url,is_primary) VALUES(30,'/images/test2.webp',1)"),/UNIQUE/);
+  db.close();
+});

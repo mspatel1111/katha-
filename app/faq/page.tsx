@@ -1,0 +1,3 @@
+import {getSettings} from "@/lib/settings-db";import {pageMetadata} from "@/lib/seo";import {StoreHeader} from "@/app/store-header";import {StoreFooter} from "@/app/store-footer";
+export const dynamic="force-dynamic";export const metadata=pageMetadata("FAQ | KATHA","Answers about sizing, delivery and orders.","/faq");
+export default async function FAQ(){const settings=await getSettings();return <main><StoreHeader/><section className="customer-content"><h1>Frequently asked questions</h1>{settings.faq.map((faq,i)=><details key={i}><summary>{faq.question}</summary><p>{faq.answer}</p></details>)}</section><StoreFooter/></main>;}

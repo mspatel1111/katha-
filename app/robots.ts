@@ -1,0 +1,1 @@
+import {SITE_ORIGIN} from "@/lib/seo";export default function robots(){return {rules:{userAgent:"*",allow:"/",disallow:["/admin","/api/","/checkout","/order-success","/favorites","/track-order"]},sitemap:SITE_ORIGIN+"/sitemap.xml"};}
